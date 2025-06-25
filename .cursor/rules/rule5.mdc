@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+the tech stack for this project is react.js, express and mongodb. Use Tailwind CSS for styling and shadcn as the componenet library. I want you to customize the shadcn components and don't follow the default theme. Make it look modern with great ui/ux.

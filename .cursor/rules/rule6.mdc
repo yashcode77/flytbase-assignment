@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+for toast use react-hot-toast. Do not use the toast from shadcn.
