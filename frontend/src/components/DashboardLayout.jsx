@@ -92,6 +92,7 @@ export default function DashboardLayout() {
                     </div>
                 </header>
                 <div className="flex-1 p-8 overflow-y-auto">
+                <div style={{ color: 'red', fontSize: 32 }}></div>
                     <Outlet />
                 </div>
             </main>

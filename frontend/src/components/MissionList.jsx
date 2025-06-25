@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Search, Filter, Plus, Eye, Edit, Trash2, Calendar, MapPin, Target } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Input } from './ui/input';
 
 export default function MissionList() {
     const [missions, setMissions] = useState([]);
@@ -10,6 +11,8 @@ export default function MissionList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState('all');
+    const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+    const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
     useEffect(() => {
         fetchMissions();
@@ -116,40 +119,46 @@ export default function MissionList() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="relative">
-                        <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <input
+                        <Input
                             type="text"
                             placeholder="Search missions..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                            className="pl-10 pr-4 py-2 mb-1"
                         />
                     </div>
 
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                    >
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="active">Active</option>
-                        <option value="completed">Completed</option>
-                        <option value="failed">Failed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
+                    <div className="relative">
+                        <button type="button" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 flex justify-between items-center" onClick={() => setShowStatusDropdown(v => !v)}>
+                            {statusFilter === 'all' ? 'All Status' : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        {showStatusDropdown && (
+                            <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg">
+                                {['all', 'pending', 'active', 'completed', 'failed', 'cancelled'].map(status => (
+                                    <li key={status} className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer" onClick={() => { setStatusFilter(status); setShowStatusDropdown(false); }}>
+                                        {status === 'all' ? 'All Status' : status.charAt(0).toUpperCase() + status.slice(1)}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
 
-                    <select
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                    >
-                        <option value="all">All Types</option>
-                        <option value="surveillance">Surveillance</option>
-                        <option value="mapping">Mapping</option>
-                        <option value="inspection">Inspection</option>
-                        <option value="delivery">Delivery</option>
-                    </select>
+                    <div className="relative">
+                        <button type="button" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 flex justify-between items-center" onClick={() => setShowTypeDropdown(v => !v)}>
+                            {typeFilter === 'all' ? 'All Types' : typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)}
+                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        {showTypeDropdown && (
+                            <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg">
+                                {['all', 'surveillance', 'mapping', 'inspection', 'delivery'].map(type => (
+                                    <li key={type} className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer" onClick={() => { setTypeFilter(type); setShowTypeDropdown(false); }}>
+                                        {type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
 
                     <Button
                         variant="outline"

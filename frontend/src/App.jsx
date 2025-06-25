@@ -78,85 +78,20 @@ function App() {
         />
 
         <Routes>
-          <Route path="/login" element={
-            isAuthenticated() ? <Navigate to="/" replace /> : <Login />
-          } />
-          <Route path="/register" element={
-            isAuthenticated() ? <Navigate to="/" replace /> : <Register />
-          } />
-
-          <Route path="/" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/missions" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <MissionList />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/missions/create" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <MissionForm />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/missions/:id" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <MissionDetail />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/missions/:id/edit" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <MissionForm />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/reports" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Reports />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/drones" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <DroneFleet />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/analytics" element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Analytics />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/auth-callback" element={
-            <AuthCallback />
-          } />
-
-          {/* Catch-all route for unmatched paths */}
-          <Route path="*" element={
-            isAuthenticated() ? <Navigate to="/" replace /> : <Navigate to="/login" replace />
-          } />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/auth-callback" element={<AuthCallback />} />
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="missions" element={<MissionList />} />
+            <Route path="missions/create" element={<MissionForm />} />
+            <Route path="missions/:id" element={<MissionDetail />} />
+            <Route path="missions/:id/edit" element={<MissionForm />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="drones" element={<DroneFleet />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>

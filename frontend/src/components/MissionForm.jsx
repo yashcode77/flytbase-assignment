@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from './ui/button';
 import toast from 'react-hot-toast';
+import { Input } from './ui/input';
 
 const schema = z.object({
     name: z.string().min(2, 'Mission name must be at least 2 characters'),
@@ -25,6 +26,9 @@ export default function MissionForm() {
     const [fetching, setFetching] = useState(false);
     const [availableDrones, setAvailableDrones] = useState([]);
     const isEditing = Boolean(id);
+    const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+    const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
+    const [showDroneDropdown, setShowDroneDropdown] = useState(false);
 
     const {
         register,
@@ -32,6 +36,7 @@ export default function MissionForm() {
         formState: { errors },
         setValue,
         reset,
+        watch,
     } = useForm({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -174,10 +179,10 @@ export default function MissionForm() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Mission Name *
                             </label>
-                            <input
+                            <Input
                                 type="text"
                                 {...register('name')}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                className="mb-1"
                                 placeholder="Enter mission name"
                             />
                             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
@@ -187,15 +192,22 @@ export default function MissionForm() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Mission Type *
                             </label>
-                            <select
-                                {...register('missionType')}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                            >
-                                <option value="surveillance">Surveillance</option>
-                                <option value="mapping">Mapping</option>
-                                <option value="inspection">Inspection</option>
-                                <option value="delivery">Delivery</option>
-                            </select>
+                            <div className="relative">
+                                <button type="button" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 flex justify-between items-center" onClick={() => setShowTypeDropdown(v => !v)}>
+                                    {watch('missionType') || 'Select mission type'}
+                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                {showTypeDropdown && (
+                                    <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg">
+                                        {['surveillance', 'mapping', 'inspection', 'delivery'].map(type => (
+                                            <li key={type} className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer" onClick={() => { setValue('missionType', type); setShowTypeDropdown(false); }}>
+                                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                            {errors.missionType && <p className="text-red-500 text-sm mt-1">{errors.missionType.message}</p>}
                         </div>
                     </div>
 
@@ -206,7 +218,7 @@ export default function MissionForm() {
                         <textarea
                             {...register('description')}
                             rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 mb-1"
                             placeholder="Describe the mission objectives and requirements"
                         />
                         {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
@@ -217,26 +229,33 @@ export default function MissionForm() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Priority *
                             </label>
-                            <select
-                                {...register('priority')}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                            >
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="critical">Critical</option>
-                            </select>
+                            <div className="relative">
+                                <button type="button" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 flex justify-between items-center" onClick={() => setShowPriorityDropdown(v => !v)}>
+                                    {watch('priority') || 'Select priority'}
+                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                </button>
+                                {showPriorityDropdown && (
+                                    <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg">
+                                        {['low', 'medium', 'high', 'critical'].map(type => (
+                                            <li key={type} className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer" onClick={() => { setValue('priority', type); setShowPriorityDropdown(false); }}>
+                                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Scheduled Date
                             </label>
-                            <input
+                            <Input
                                 type="datetime-local"
                                 {...register('scheduledAt')}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                                className="mb-1"
                             />
+                            {errors.scheduledAt && <p className="text-red-500 text-sm mt-1">{errors.scheduledAt.message}</p>}
                         </div>
                     </div>
                 </div>
@@ -249,12 +268,12 @@ export default function MissionForm() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Latitude *
                             </label>
-                            <input
+                            <Input
                                 type="number"
                                 step="any"
                                 {...register('latitude', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                placeholder="e.g., 40.7128"
+                                placeholder="Latitude"
+                                className="mb-1"
                             />
                             {errors.latitude && <p className="text-red-500 text-sm mt-1">{errors.latitude.message}</p>}
                         </div>
@@ -263,12 +282,12 @@ export default function MissionForm() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Longitude *
                             </label>
-                            <input
+                            <Input
                                 type="number"
                                 step="any"
                                 {...register('longitude', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                placeholder="e.g., -74.0060"
+                                placeholder="Longitude"
+                                className="mb-1"
                             />
                             {errors.longitude && <p className="text-red-500 text-sm mt-1">{errors.longitude.message}</p>}
                         </div>
@@ -277,11 +296,11 @@ export default function MissionForm() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Altitude (meters) *
                             </label>
-                            <input
+                            <Input
                                 type="number"
                                 {...register('altitude', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                                placeholder="e.g., 100"
+                                placeholder="Altitude (meters)"
+                                className="mb-1"
                             />
                             {errors.altitude && <p className="text-red-500 text-sm mt-1">{errors.altitude.message}</p>}
                         </div>
@@ -291,17 +310,23 @@ export default function MissionForm() {
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Assign Drone (Optional)
                         </label>
-                        <select
-                            {...register('droneId')}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                        >
-                            <option value="">Select a drone</option>
-                            {availableDrones.map(drone => (
-                                <option key={drone._id} value={drone._id}>
-                                    {drone.name} - {drone.model} (Battery: {drone.batteryLevel}%)
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <button type="button" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 flex justify-between items-center" onClick={() => setShowDroneDropdown(v => !v)}>
+                                {watch('droneId') ? (availableDrones.find(d => d._id === watch('droneId'))?.name || 'Select a drone') : 'Select a drone'}
+                                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+                            {showDroneDropdown && (
+                                <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                    <li className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer" onClick={() => { setValue('droneId', ''); setShowDroneDropdown(false); }}>No drone assigned</li>
+                                    {availableDrones.map(drone => (
+                                        <li key={drone._id} className="px-4 py-2 hover:bg-blue-100 dark:hover:bg-blue-800 cursor-pointer" onClick={() => { setValue('droneId', drone._id); setShowDroneDropdown(false); }}>
+                                            {drone.name} - {drone.model} (Battery: {drone.batteryLevel}%)
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        {errors.droneId && <p className="text-red-500 text-sm mt-1">{errors.droneId.message}</p>}
                     </div>
                 </div>
 
