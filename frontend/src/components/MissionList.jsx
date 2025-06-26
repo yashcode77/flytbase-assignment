@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Search, Filter, Plus, Eye, Edit, Trash2, Calendar, MapPin, Target, Map, Route, Settings2, Table, LayoutGrid } from 'lucide-react';
+import { Search, Filter, Plus, Eye, Edit, Trash2, Calendar, MapPin, Target, Map, Route, Settings2, Table, LayoutGrid, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Input } from './ui/input';
 import { ClipLoader } from 'react-spinners';
@@ -15,6 +15,10 @@ export default function MissionList() {
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
     const [showTypeDropdown, setShowTypeDropdown] = useState(false);
     const [viewMode, setViewMode] = useState(() => localStorage.getItem('missionsViewMode') || 'card');
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(9); // 9 for 3x3 grid in card view
 
     useEffect(() => {
         fetchMissions();
@@ -95,6 +99,24 @@ export default function MissionList() {
 
         return matchesSearch && matchesStatus && matchesType;
     });
+
+    // Pagination calculations
+    const totalItems = filteredMissions.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentMissions = filteredMissions.slice(startIndex, endIndex);
+
+    // Reset to first page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter, typeFilter]);
+
+    // Update items per page based on view mode
+    useEffect(() => {
+        setItemsPerPage(viewMode === 'card' ? 9 : 10);
+        setCurrentPage(1);
+    }, [viewMode]);
 
     // Determine if filters are active
     const filtersActive = searchTerm || statusFilter !== 'all' || typeFilter !== 'all';
@@ -228,7 +250,7 @@ export default function MissionList() {
             {!loading && (
                 viewMode === 'card' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredMissions.map(mission => (
+                        {currentMissions.map(mission => (
                             <div key={mission._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-2xl transition-shadow duration-200 group flex flex-col h-full">
                                 {/* Card Header */}
                                 <div className="flex items-center justify-between px-6 pt-6 pb-2 border-b border-gray-100 dark:border-gray-700">
@@ -313,7 +335,7 @@ export default function MissionList() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                {filteredMissions.map(mission => (
+                                {currentMissions.map(mission => (
                                     <tr key={mission._id} className="hover:bg-blue-50 dark:hover:bg-gray-900 transition-colors">
                                         <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{mission.name}</td>
                                         <td className="px-4 py-3">
@@ -358,6 +380,114 @@ export default function MissionList() {
                         </table>
                     </div>
                 )
+            )}
+
+            {/* Pagination */}
+            {!loading && totalPages > 1 && (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                            Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} missions
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {/* First Page */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(1)}
+                                disabled={currentPage === 1}
+                                className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                            >
+                                <ChevronsLeft size={16} />
+                            </Button>
+
+                            {/* Previous Page */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                            >
+                                <ChevronLeft size={16} />
+                            </Button>
+
+                            {/* Page Numbers */}
+                            <div className="flex items-center gap-1">
+                                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                    let pageNum;
+                                    if (totalPages <= 5) {
+                                        pageNum = i + 1;
+                                    } else if (currentPage <= 3) {
+                                        pageNum = i + 1;
+                                    } else if (currentPage >= totalPages - 2) {
+                                        pageNum = totalPages - 4 + i;
+                                    } else {
+                                        pageNum = currentPage - 2 + i;
+                                    }
+
+                                    return (
+                                        <Button
+                                            key={pageNum}
+                                            variant={currentPage === pageNum ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => setCurrentPage(pageNum)}
+                                            className={currentPage === pageNum
+                                                ? "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
+                                                : "dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                                            }
+                                        >
+                                            {pageNum}
+                                        </Button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Next Page */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                            >
+                                <ChevronRight size={16} />
+                            </Button>
+
+                            {/* Last Page */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(totalPages)}
+                                disabled={currentPage === totalPages}
+                                className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                            >
+                                <ChevronsRight size={16} />
+                            </Button>
+                        </div>
+
+                        {/* Items per page selector */}
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Show:</span>
+                            <select
+                                value={itemsPerPage}
+                                onChange={(e) => {
+                                    setItemsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
+                                className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                            >
+                                <option value={6}>6</option>
+                                <option value={9}>9</option>
+                                <option value={12}>12</option>
+                                <option value={15}>15</option>
+                                <option value={20}>20</option>
+                            </select>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">per page</span>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

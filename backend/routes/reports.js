@@ -1,30 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const reportsController = require('../controllers/reportsController');
+const {
+    getAllReports,
+    getReportById,
+    generateReport,
+    updateReport,
+    deleteReport,
+    generateAnalyticsReport,
+    getReportStats,
+    exportReport
+} = require('../controllers/reports');
 
 // Get all reports
-router.get('/', auth, reportsController.getReports);
+router.get('/', auth, getAllReports);
 
 // Get report statistics
-router.get('/stats/overview', auth, reportsController.getReportsStats);
+router.get('/stats', auth, getReportStats);
 
 // Get single report
-router.get('/:id', auth, reportsController.getReport);
+router.get('/:id', auth, getReportById);
 
-// Create new report
-router.post('/', auth, reportsController.createReport);
-
-// Update report
-router.put('/:id', auth, reportsController.updateReport);
-
-// Delete report
-router.delete('/:id', auth, reportsController.deleteReport);
+// Generate new report
+router.post('/', auth, generateReport);
 
 // Generate analytics report
-router.post('/analytics', auth, reportsController.generateAnalytics);
+router.post('/analytics', auth, generateAnalyticsReport);
 
-// Generate mission summary report
-router.post('/mission/:missionId/summary', auth, reportsController.generateMissionSummary);
+// Update report
+router.put('/:id', auth, updateReport);
+
+// Delete report
+router.delete('/:id', auth, deleteReport);
+
+// Export report
+router.get('/:id/export', auth, exportReport);
 
 module.exports = router; 
