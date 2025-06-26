@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard';
 import MissionList from './components/MissionList';
 import MissionForm from './components/MissionForm';
 import MissionDetail from './components/MissionDetail';
+import MissionMonitor from './components/MissionMonitor';
 import Reports from './components/Reports';
 import DroneFleet from './components/DroneFleet';
 import Analytics from './components/Analytics';
@@ -87,6 +88,7 @@ function App() {
             <Route path="missions/create" element={<MissionForm />} />
             <Route path="missions/:id" element={<MissionDetail />} />
             <Route path="missions/:id/edit" element={<MissionForm />} />
+            <Route path="missions/:id/monitor" element={<MissionMonitor />} />
             <Route path="reports" element={<Reports />} />
             <Route path="drones" element={<DroneFleet />} />
             <Route path="analytics" element={<Analytics />} />

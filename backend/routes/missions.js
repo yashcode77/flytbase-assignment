@@ -49,7 +49,10 @@ router.post('/', auth, async (req, res) => {
             missionType,
             priority,
             scheduledAt,
-            droneId
+            droneId,
+            surveyArea,
+            flightPath,
+            dataCollection
         } = req.body;
 
         // Validation
@@ -61,6 +64,14 @@ router.post('/', auth, async (req, res) => {
             return res.status(400).json({ message: 'Please provide valid coordinates' });
         }
 
+        if (surveyArea && (!Array.isArray(surveyArea) || surveyArea.length < 3)) {
+            return res.status(400).json({ message: 'Survey area must have at least 3 points' });
+        }
+
+        if (flightPath && !Array.isArray(flightPath)) {
+            return res.status(400).json({ message: 'Flight path must be an array' });
+        }
+
         const newMission = new Mission({
             name,
             description,
@@ -70,7 +81,10 @@ router.post('/', auth, async (req, res) => {
             scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
             droneId,
             createdBy: req.user.id,
-            status: 'pending'
+            status: 'pending',
+            surveyArea,
+            flightPath,
+            dataCollection
         });
 
         const mission = await newMission.save();
@@ -103,23 +117,29 @@ router.put('/:id', auth, async (req, res) => {
         }
 
         const {
-            name,
-            description,
-            coordinates,
-            missionType,
-            priority,
-            scheduledAt,
-            droneId
+            name: updateName,
+            description: updateDescription,
+            coordinates: updateCoordinates,
+            missionType: updateMissionType,
+            priority: updatePriority,
+            scheduledAt: updateScheduledAt,
+            droneId: updateDroneId,
+            surveyArea: updateSurveyArea,
+            flightPath: updateFlightPath,
+            dataCollection: updateDataCollection
         } = req.body;
 
         // Update fields
-        if (name) mission.name = name;
-        if (description) mission.description = description;
-        if (coordinates) mission.coordinates = coordinates;
-        if (missionType) mission.missionType = missionType;
-        if (priority) mission.priority = priority;
-        if (scheduledAt !== undefined) mission.scheduledAt = scheduledAt ? new Date(scheduledAt) : null;
-        if (droneId !== undefined) mission.droneId = droneId;
+        if (updateName) mission.name = updateName;
+        if (updateDescription) mission.description = updateDescription;
+        if (updateCoordinates) mission.coordinates = updateCoordinates;
+        if (updateMissionType) mission.missionType = updateMissionType;
+        if (updatePriority) mission.priority = updatePriority;
+        if (updateScheduledAt !== undefined) mission.scheduledAt = updateScheduledAt ? new Date(updateScheduledAt) : null;
+        if (updateDroneId !== undefined) mission.droneId = updateDroneId;
+        if (updateSurveyArea) mission.surveyArea = updateSurveyArea;
+        if (updateFlightPath) mission.flightPath = updateFlightPath;
+        if (updateDataCollection) mission.dataCollection = updateDataCollection;
 
         const updatedMission = await mission.save();
         await updatedMission.populate('createdBy', 'name email');

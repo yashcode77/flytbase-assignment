@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
-import { MapPin, Clock, Calendar, Target, BarChart3, Edit, Trash2 } from 'lucide-react';
+import { MapPin, Clock, Calendar, Target, BarChart3, Edit, Trash2, FileText, Monitor } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function MissionDetail() {
@@ -10,6 +10,7 @@ export default function MissionDetail() {
     const [mission, setMission] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [generatingReport, setGeneratingReport] = useState(false);
 
     useEffect(() => {
         fetchMission();
@@ -88,6 +89,30 @@ export default function MissionDetail() {
         }
     };
 
+    const generateReport = async () => {
+        setGeneratingReport(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/reports/mission/${id}/summary`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                toast.success('Mission summary report generated successfully');
+                navigate('/reports');
+            } else {
+                toast.error('Failed to generate mission summary');
+            }
+        } catch (error) {
+            toast.error('Error generating mission summary');
+        } finally {
+            setGeneratingReport(false);
+        }
+    };
+
     const getStatusColor = (status) => {
         const colors = {
             pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -134,6 +159,23 @@ export default function MissionDetail() {
                     <p className="text-gray-600 dark:text-gray-300">{mission.description}</p>
                 </div>
                 <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={generateReport}
+                        disabled={generatingReport}
+                        className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                    >
+                        <FileText size={16} className="mr-2" />
+                        {generatingReport ? 'Generating...' : 'Generate Report'}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={() => navigate(`/missions/${id}/monitor`)}
+                        className="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                    >
+                        <Monitor size={16} className="mr-2" />
+                        Monitor Mission
+                    </Button>
                     <Button
                         variant="outline"
                         onClick={() => navigate(`/missions/${id}/edit`)}

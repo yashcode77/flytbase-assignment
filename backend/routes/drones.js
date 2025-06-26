@@ -61,7 +61,8 @@ router.post('/', auth, async (req, res) => {
             maxAltitude,
             maxSpeed,
             batteryCapacity,
-            cameraResolution
+            cameraResolution,
+            notes
         } = req.body;
 
         // Validation
@@ -79,7 +80,8 @@ router.post('/', auth, async (req, res) => {
             batteryLevel: 100,
             cameraResolution: cameraResolution || '4K',
             status: 'available',
-            owner: req.user.id
+            owner: req.user.id,
+            notes: notes || ''
         });
 
         const drone = await newDrone.save();
@@ -112,18 +114,20 @@ router.put('/:id', auth, async (req, res) => {
             maxSpeed,
             batteryCapacity,
             cameraResolution,
-            status
+            status,
+            notes
         } = req.body;
 
         // Update fields
-        if (name) drone.name = name;
-        if (model) drone.model = model;
-        if (serialNumber) drone.serialNumber = serialNumber;
-        if (maxAltitude) drone.maxAltitude = maxAltitude;
-        if (maxSpeed) drone.maxSpeed = maxSpeed;
-        if (batteryCapacity) drone.batteryCapacity = batteryCapacity;
-        if (cameraResolution) drone.cameraResolution = cameraResolution;
-        if (status) drone.status = status;
+        if (name !== undefined) drone.name = name;
+        if (model !== undefined) drone.model = model;
+        if (serialNumber !== undefined) drone.serialNumber = serialNumber;
+        if (maxAltitude !== undefined) drone.maxAltitude = maxAltitude;
+        if (maxSpeed !== undefined) drone.maxSpeed = maxSpeed;
+        if (batteryCapacity !== undefined) drone.batteryCapacity = batteryCapacity;
+        if (cameraResolution !== undefined) drone.cameraResolution = cameraResolution;
+        if (status !== undefined) drone.status = status;
+        if (notes !== undefined) drone.notes = notes;
 
         const updatedDrone = await drone.save();
         res.json(updatedDrone);

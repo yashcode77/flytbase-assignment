@@ -13,12 +13,19 @@ const MissionSchema = new mongoose.Schema({
         longitude: { type: Number, required: true },
         altitude: { type: Number, default: 100 }
     },
-    flightPath: [{
-        latitude: Number,
-        longitude: Number,
-        altitude: Number,
-        timestamp: Date
+    surveyArea: [{
+        latitude: { type: Number, required: true },
+        longitude: { type: Number, required: true }
     }],
+    flightPath: [{
+        latitude: { type: Number, required: true },
+        longitude: { type: Number, required: true },
+        altitude: { type: Number, required: true },
+    }],
+    dataCollection: {
+        frequency: { type: Number, default: 5 },
+        sensors: [{ type: String, enum: ['camera', 'thermal', 'lidar', 'multispectral', 'other'] }]
+    },
     scheduledAt: { type: Date },
     startedAt: { type: Date },
     completedAt: { type: Date },
